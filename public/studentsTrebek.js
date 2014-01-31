@@ -1,32 +1,46 @@
 $(document).ready(function(){
-	var $card = $(".card").not(".cat-card");
-	var numClicksOnCard = 0;
-	
-	$card.on("click", function(){	
-		$card.not(this).addClass("disabled");
-		$(this).not(".disabled").addClass("chosen");
-		$(".up, .down").removeClass("disabled");
+  var $card = $(".card").not(".cat-card");
+  var $points;
 
-		var $cardQuestion = $(".chosen"); //This is weird but it doesn't evaluate outside the function for the initial card click
-		$cardQuestion.on("click", function(){	
-			var $question = $(this).first().children().filter(".question");
-			var $value = $(this).first().children().filter(".value");
-			var $answer = $(this).first().children().filter(".answer");
-			if(numClicksOnCard == 0){
-				$value.text($question.text()); //set the value of value to the text in the question
-				numClicksOnCard = 1; //I don't know how else to know when the card is activated with the question
-			}else if(numClicksOnCard == 1){
-				$value.text($answer.text()); 
-				numClicksOnCard = 2;
-			}else if(numClicksOnCard == 2){ 
-				console.log(numClicksOnCard); //having trouble with this evaluating immediately after I click the card twice
-				// $value.text("");
-				// $(".chosen").addClass("played");
-				numClicksOnCard = 3;
-			}
-		});
-	});
-	
+  $card.on("click", function(){
+    var $this = $(this);
+    var $other = $card.not($this).not(".played");
+    var $disabled = $this.hasClass("disabled");
+    var $question = $this.children().filter(".question");
+    var $answer = $this.children().filter(".answer");
+    var $value = $this.children().filter(".value");
 
+    if (!$disabled && $value.attr("style") == null){
+      $other.addClass("disabled");
+      $this.addClass("chosen");
+      $value.attr("style", "display: none");
+      $question.attr("style", "display: block");
+      $("button").removeClass("disabled");
+      $points = $value.text();
+    } else if (!$disabled && $question.attr("style") == "display: block"){
+      $question.attr("style", "display: none");
+      $answer.attr("style", "display: block");
+    } else if (!$disabled && $answer.attr("style") == "display: block"){
+      $answer.attr("style", "display: none");
+      $this.addClass("disabled played");
+      $other.removeClass("disabled");
+      $("button").addClass("disabled");
+    }
+  });
+
+  $("button").on("click", function(){
+    var $this = $(this);
+    var $score = $this.siblings("h2");
+    if (!($this.hasClass("disabled"))){
+      if ($this.hasClass("up")){
+        $score.text(Number($score.text()) + Number($points));
+        $("button").addClass("disabled");
+      } else {
+        $score.text(Number($score.text()) - Number($points));
+        $this.addClass("disabled");
+        $this.prev().addClass("disabled");
+      }
+    }
+  });
 
 });
