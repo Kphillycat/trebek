@@ -4,6 +4,7 @@ $(document).ready(function(){
 	$card.on("click", function(){	
 		$card.not(this).addClass("disabled");
 		$(this).not(".disabled").addClass("chosen");
+		$(".up, .down").removeClass("disabled");
 	});
 
 });
